@@ -29,6 +29,7 @@ class GeFormService {
 
     fieldMappings;
     objectMappings;
+    fieldTargetMappings;
 
     /**
      * Retrieve the default form render wrapper.
@@ -40,6 +41,7 @@ class GeFormService {
                 .then((result) => {
                     this.fieldMappings = result.fieldMappingSetWrapper.fieldMappingByDevName;
                     this.objectMappings = result.fieldMappingSetWrapper.objectMappingByDevName;
+                    this.fieldTargetMappings = result.fieldMappingSetWrapper.fieldMappingByTargetFieldName;
                     resolve(result);
                 })
                 .catch(error => {
@@ -73,6 +75,15 @@ class GeFormService {
      */
     getFieldMappingWrapper(fieldDevName) {
         return this.fieldMappings[fieldDevName];
+    }
+
+    /**
+     * Get a field info object by dev name from the render wrapper object
+     * @param fieldDevName  Dev name of the object to retrieve
+     * @returns {BDI_FieldMapping}
+     */
+    getFieldMappingWrapperFromTarget(targetFieldName) {
+        return this.fieldTargetMappings[targetFieldName];
     }
 
     /**

@@ -12,8 +12,20 @@ export default class GeFormField extends LightningElement {
     @track value;
     @track picklistValues = [];
     @api element;
+    @api targetFieldName;
 
     changeTimeout;
+
+    connectedCallback(){
+        if(this.targetFieldName !== undefined){
+            // Construct an element object using the field name and mapping info
+            this.element = {
+                label: this.fieldInfo.Target_Field_Label,
+                required: this.fieldInfo.Is_Required,
+                dataImportFieldMappingDevNames: [this.targetFieldName]
+            };
+        }
+    }
 
     handleValueChange(event) {
         this.value = this.getValueFromChangeEvent(event);
@@ -44,9 +56,9 @@ export default class GeFormField extends LightningElement {
         // We need to check for invalid values, regardless if the field is required
         let fieldIsValid = this.checkFieldValidity();
 
-        if(this.element.required) {
-            return this.value !== null
-                && typeof this.value !== 'undefined'
+        if(this.element !== null && this.element.required) {
+            return this.value !== null 
+                && typeof this.value !== 'undefined' 
                 && this.value !== ''
                 && fieldIsValid;
         }
@@ -79,9 +91,8 @@ export default class GeFormField extends LightningElement {
         // However, it may change to the array dataImportFieldMappingDevNames
         // If so, we need to update this to reflect that.
         // In the Execute Anonymous code, both fields are populated.
-        // PRINCE: Temporary change below. Please review and update
-        // as needed.
-        // Changed 'this.element.value' references to getter 'formElementName'.
+
+        // TODO: Update for widget fields
         fieldAndValue[this.formElementName] = this.value;
         
         return fieldAndValue;
@@ -100,7 +111,9 @@ export default class GeFormField extends LightningElement {
     }
 
     get fieldInfo() {
-        return GeFormService.getFieldMappingWrapper(this.formElementName);
+        return this.targetFieldName !== undefined ? 
+            GeFormService.getFieldMappingWrapperFromTarget(this.targetFieldName) :
+            GeFormService.getFieldMappingWrapper(this.formElementName);
     }
 
     get objectInfo() {
